@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tekmon</title>
+  <meta name="description"
+    content="Upload and map lead or company lists with ease. Sends structured data to your workflow automatically." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Canela via your font license — replace YOUR_KIT_ID if using Adobe Fonts, or host the font files yourself -->
+  <link rel="stylesheet" href="https://use.typekit.net/YOUR_KIT_ID.css" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- PapaParse: CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- SheetJS: XLSX parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ─── NAV ─── -->
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-logo" href="#">
+        <img
+          src="https://images.ctfassets.net/ktn111j92rjl/QJUGNfyrlW58EgayGLDPZ/7eb8f1578b469c85104643ec883fbba2/Logotype.svg"
+          alt="Tekmon" class="nav-logo-img" />
+      </a>
+      <div class="nav-divider"></div>
+      <div class="nav-links">
+        <button class="nav-link" data-page="dashboard" id="nav-dashboard">Dashboard</button>
+        <button class="nav-link" data-page="leads" id="nav-leads">Lead List</button>
+        <button class="nav-link" data-page="companies" id="nav-companies">Company List</button>
+        <a class="nav-link nav-link-external" href="https://airtable.com/appofWsUg8Ply5bYd/pag5yt99HNCx5NRia"
+          target="_blank" rel="noopener noreferrer">Database</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE: DASHBOARD -->
+  <div class="page" id="page-dashboard">
+    <div class="container">
+
+      <div class="dash-header">
+        <h1 class="dash-title">Dashboard <span>Overview</span></h1>
+        <p class="dash-subtitle">Custom data import portal for Tekmon. Upload and map your contacts and companies
+          directly into your Airtable database.</p>
+      </div>
+
+      <div class="dash-body">
+
+        <!-- Left: cards -->
+        <div class="dash-cards">
+          <p class="dash-section-title">Tekmon Data Import Hub</p>
+          <p class="dash-section-desc">A centralised workspace for uploading lead and company lists, mapping the
+            required fields, and syncing structured data directly into your Airtable workflow.</p>
+
+          <button class="dash-card" data-page="leads">
+            <div class="dash-card-text">
+              <p class="dash-card-title">Lead List Upload</p>
+              <p class="dash-card-desc">Upload a CSV or XLSX file of leads. Map First Name, Last Name, and Company
+                Domain, then send the full list to your n8n workflow instantly.</p>
+            </div>
+            <div class="dash-card-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </div>
+          </button>
+
+          <button class="dash-card" data-page="companies">
+            <div class="dash-card-text">
+              <p class="dash-card-title">Company List Upload</p>
+              <p class="dash-card-desc">Upload a company list with target job titles and leads-per-company parameters.
+                All records are mapped and forwarded to your database automatically.</p>
+            </div>
+            <div class="dash-card-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </div>
+          </button>
+        </div>
+
+        <!-- Right: About -->
+        <aside class="dash-about">
+          <p class="dash-about-title">About</p>
+          <p class="dash-about-text">
+            This portal supports Tekmon's outreach operations by allowing teams to upload custom contact and company
+            lists and integrate them directly into the Airtable database.
+          </p>
+          <p class="dash-about-text">
+            It handles CSV and XLSX parsing, required field mapping, optional column forwarding, and structured webhook
+            dispatch. All from a single clean interface.
+          </p>
+          <a class="dash-about-link" href="https://airtable.com/appofWsUg8Ply5bYd/pag5yt99HNCx5NRia" target="_blank"
+            rel="noopener noreferrer">
+            View Database
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="7" y1="17" x2="17" y2="7" />
+              <polyline points="7 7 17 7 17 17" />
+            </svg>
+          </a>
+        </aside>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: LEADS -->
+  <div class="page" id="page-leads">
+    <div class="container">
+
+      <div class="page-header">
+        <div class="page-badge">Lead Upload</div>
+        <h1 class="page-title">Upload a <span>Lead List</span></h1>
+        <p class="page-desc">
+          Upload a CSV or XLSX file with your leads. Map the required fields and all remaining
+          columns will be forwarded automatically.
+        </p>
+        <p class="row-limit-notice">* Maximum number of rows that can be uploaded is below 1,000.</p>
+      </div>
+
+      <hr class="section-divider" />
+
+      <!-- Required fields info -->
+      <div class="fields-info">
+        <h3>Required Fields</h3>
+        <ul>
+          <li><span class="field-tag required">First Name</span></li>
+          <li><span class="field-tag required">Last Name</span></li>
+          <li><span class="field-tag required">Company Domain</span></li>
+          <li><span class="field-tag" style="color:var(--text-muted)">+ all other columns sent as-is</span></li>
+        </ul>
+      </div>
+
+      <!-- Upload zone -->
+      <div class="upload-zone" id="zone-leads" role="button" tabindex="0" aria-label="Upload lead file">
+        <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <p class="upload-title">Drag &amp; drop your file here</p>
+        <p class="upload-sub">or <span onclick="document.getElementById('file-input-leads').click()">browse to
+            upload</span></p>
+        <p class="upload-sub" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.25)">CSV · XLSX · XLS</p>
+        <input type="file" id="file-input-leads" accept=".csv,.xlsx,.xls" />
+      </div>
+
+      <!-- Mapping section (hidden until file loaded) -->
+      <div class="mapping-section" id="mapping-leads">
+
+        <!-- File meta -->
+        <div class="file-meta">
+          <svg class="file-meta-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          <span class="file-meta-name" id="meta-name-leads"></span>
+          <span class="file-meta-rows" id="meta-rows-leads"></span>
+          <button class="btn-remove" id="btn-remove-leads" title="Remove file">&times;</button>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- Required field mapping -->
+        <p class="mapping-label">Map Required Fields</p>
+        <div class="mapping-grid" id="mapping-grid-leads"></div>
+
+        <!-- Other fields preview -->
+        <div class="other-fields-section">
+          <p class="other-fields-label">All Columns Detected</p>
+          <div class="other-fields-list" id="other-fields-leads"></div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- Submit -->
+        <button class="btn-submit" id="btn-submit-leads">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+          Send Lead List
+        </button>
+
+        <!-- Status -->
+        <div class="status-bar" id="status-leads" role="alert"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── PAGE: COMPANIES ─── -->
+  <div class="page" id="page-companies">
+    <div class="container">
+
+      <div class="page-header">
+        <div class="page-badge">Company Upload</div>
+        <h1 class="page-title">Upload a <span>Company List</span></h1>
+        <p class="page-desc">
+          Upload a CSV or XLSX file with company data. Map the required fields and all other
+          columns will be forwarded automatically.
+        </p>
+        <p class="row-limit-notice">* Maximum number of rows that can be uploaded is below 1,000.</p>
+      </div>
+
+      <hr class="section-divider" />
+
+      <!-- Required fields info -->
+      <div class="fields-info">
+        <h3>Required Fields</h3>
+        <ul>
+          <li><span class="field-tag required">Company Name</span></li>
+          <li><span class="field-tag" style="color:var(--text-secondary)">Company Domain</span></li>
+          <li><span class="field-tag" style="color:var(--text-muted)">+ all other columns sent as-is</span></li>
+        </ul>
+      </div>
+
+
+      <!-- Additional required inputs -->
+      <div class="extra-fields">
+
+        <div class="extra-field-group">
+          <label class="extra-field-label" for="input-job-titles">
+            Target Job Titles
+            <span class="extra-field-required">*</span>
+          </label>
+          <textarea id="input-job-titles" class="extra-field-input extra-field-textarea"
+            placeholder="e.g., QHSE Director, EHS Manager, HSE Manager, Safety Director, Head of QHSE" rows="3"
+            autocomplete="off"></textarea>
+          <p class="extra-field-hint">Enter the job titles you want to target, separated by commas.</p>
+        </div>
+
+        <div class="extra-field-group">
+          <label class="extra-field-label" for="input-leads-count">
+            Leads to Generate
+            <span class="extra-field-required">*</span>
+          </label>
+          <input type="number" id="input-leads-count" class="extra-field-input extra-field-input--short"
+            placeholder="e.g., 30" min="1" max="50" autocomplete="off" />
+          <p class="extra-field-hint">Number of leads to return per company. Maximum is 50.</p>
+        </div>
+
+      </div>
+
+      <!-- Upload zone -->
+      <div class="upload-zone" id="zone-companies" role="button" tabindex="0" aria-label="Upload company file">
+        <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <p class="upload-title">Drag &amp; drop your file here</p>
+        <p class="upload-sub">or <span onclick="document.getElementById('file-input-companies').click()">browse to
+            upload</span></p>
+        <p class="upload-sub" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.25)">CSV · XLSX · XLS</p>
+        <input type="file" id="file-input-companies" accept=".csv,.xlsx,.xls" />
+      </div>
+
+      <!-- Mapping section -->
+      <div class="mapping-section" id="mapping-companies">
+
+        <!-- File meta -->
+        <div class="file-meta">
+          <svg class="file-meta-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          <span class="file-meta-name" id="meta-name-companies"></span>
+          <span class="file-meta-rows" id="meta-rows-companies"></span>
+          <button class="btn-remove" id="btn-remove-companies" title="Remove file">&times;</button>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- Required field mapping -->
+        <p class="mapping-label">Map Required Fields</p>
+        <div class="mapping-grid" id="mapping-grid-companies"></div>
+
+        <!-- Other fields preview -->
+        <div class="other-fields-section">
+          <p class="other-fields-label">All Columns Detected</p>
+          <div class="other-fields-list" id="other-fields-companies"></div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- Submit -->
+        <button class="btn-submit" id="btn-submit-companies">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+          Send Company List
+        </button>
+
+        <!-- Status -->
+        <div class="status-bar" id="status-companies" role="alert"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="footer-divider" />
+
+  <!-- Footer -->
+  <footer>
+    Built by <a href="https://zorocorp.com/" target="_blank" rel="noopener noreferrer">Zoro Corp</a>
+    &middot;
+    <a href="https://www.linkedin.com/in/aryanmahajaninstig8/" target="_blank" rel="noopener noreferrer">Aryan
+      Mahajan</a>
+  </footer>
+
+  <!-- Row Limit Modal -->
+  <div class="modal-overlay" id="row-limit-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <div class="modal-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+      </div>
+      <p class="modal-title" id="modal-title">File Upload Notice</p>
+      <p class="modal-body">Please upload a file that has fewer than <strong>1,000 rows</strong>. Files exceeding this
+        limit may not process correctly.</p>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn--cancel" id="modal-cancel">Cancel</button>
+        <button class="modal-btn modal-btn--ok" id="modal-ok">Upload File</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+</body>
+
+</html>
