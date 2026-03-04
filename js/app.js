@@ -1,10 +1,10 @@
 /**
  * Data Mapper — app.js
  * Handles CSV/XLSX parsing, column mapping UI, and webhook dispatch
- * Webhook: https://tekmon.app.n8n.cloud/webhook-test/2d13aaa3-607b-4b21-b942-74ab557150d0
+ * Webhook: https://tekmon.app.n8n.cloud/webhook/2d13aaa3-607b-4b21-b942-74ab557150d0
  */
 
-const WEBHOOK = 'https://tekmon.app.n8n.cloud/webhook-test/2d13aaa3-607b-4b21-b942-74ab557150d0';
+const WEBHOOK = 'https://tekmon.app.n8n.cloud/webhook/2d13aaa3-607b-4b21-b942-74ab557150d0';
 
 // ─── Required field definitions ───────────────────────────────────────────────
 const REQUIRED_FIELDS = {
@@ -111,6 +111,10 @@ function initUploads() {
 
     document.getElementById(`btn-remove-${type}`).addEventListener('click', () => resetPage(type));
     document.getElementById(`btn-submit-${type}`).addEventListener('click', () => submitData(type));
+
+    // "Submit Another Response" — resets the upload result screen back to upload zone
+    const resultBtn = document.getElementById(`btn-result-${type}`);
+    if (resultBtn) resultBtn.addEventListener('click', () => resetPage(type));
   });
 }
 
@@ -336,9 +340,20 @@ function autoMatch(header, key) {
 function resetPage(type) {
   state[type] = { headers: [], rows: [], fileName: '' };
   document.getElementById(`zone-${type}`).style.display = '';
+
   const section = document.getElementById(`mapping-${type}`);
   section.classList.remove('visible');
+  section.style.display = '';
+
+  // Restore all children hidden during showUploadResult
+  Array.from(section.children).forEach(child => { child.style.display = ''; });
+
   section.querySelector('.mapping-grid').innerHTML = '';
+
+  // Hide result screen
+  const result = document.getElementById(`result-${type}`);
+  if (result) result.className = 'upload-result';
+
   hideStatus(type);
 }
 
@@ -356,8 +371,8 @@ async function submitData(type) {
       return;
     }
     const leadsCount = parseInt(leadsCountEl.value, 10);
-    if (!leadsCountEl.value || isNaN(leadsCount) || leadsCount < 1 || leadsCount > 50) {
-      showStatus(type, 'error', 'Please enter a valid number of Leads to Generate (1 - 50).');
+    if (!leadsCountEl.value || isNaN(leadsCount) || leadsCount < 1 || leadsCount > 49) {
+      showStatus(type, 'error', 'Please enter a valid number of Leads to Generate (1 - 49).');
       return;
     }
   }
@@ -437,6 +452,8 @@ async function submitData(type) {
   if (type === 'companies') {
     payload.target_job_titles = document.getElementById('input-job-titles').value.trim();
     payload.leads_per_company = parseInt(document.getElementById('input-leads-count').value, 10);
+    const geographiesVal = document.getElementById('input-geographies').value.trim();
+    payload.target_geographies = geographiesVal || null;
   }
 
   btn.disabled = true;
@@ -450,12 +467,23 @@ async function submitData(type) {
     });
 
     if (resp.ok) {
-      showStatus(type, 'success', `${data.length} record${data.length !== 1 ? 's' : ''} sent successfully.${skipped > 0 ? ` ${skipped} row${skipped !== 1 ? 's' : ''} skipped (empty or missing required fields).` : ''}`);
+      const skippedNote = skipped > 0
+        ? ` ${skipped} row${skipped !== 1 ? 's' : ''} skipped (empty or missing required fields).`
+        : '';
+      const label = type === 'leads' ? 'lead' : 'company record';
+      const plural = data.length !== 1 ? (type === 'leads' ? 'leads' : 'company records') : label;
+      showUploadResult(type, 'success',
+        'Data Sent Successfully',
+        `${data.length} ${plural} sent successfully. Your data is being processed.${skippedNote}`);
     } else {
-      showStatus(type, 'error', `Webhook responded with status ${resp.status}. Check your n8n workflow.`);
+      showUploadResult(type, 'error',
+        'Data Not Sent',
+        `The webhook responded with status ${resp.status}. Please try again after some time.`);
     }
   } catch (err) {
-    showStatus(type, 'error', 'Network error — could not reach the webhook. ' + err.message);
+    showUploadResult(type, 'error',
+      'Data Not Sent',
+      'Could not reach the webhook. Please check your connection and try again after some time.');
   } finally {
     btn.disabled = false;
   }
@@ -479,6 +507,42 @@ function hideStatus(type) {
   const bar = document.getElementById(`status-${type}`);
   bar.className = 'status-bar';
   bar.innerHTML = '';
+}
+
+// Show the full-page result screen (success or error) for upload pages
+function showUploadResult(type, state, title, sub) {
+  const resultEl = document.getElementById(`result-${type}`);
+  const iconEl = document.getElementById(`result-icon-${type}`);
+  const titleEl = document.getElementById(`result-title-${type}`);
+  const subEl = document.getElementById(`result-sub-${type}`);
+  const mappingEl = document.getElementById(`mapping-${type}`);
+
+  // Update text
+  titleEl.textContent = title;
+  subEl.textContent = sub;
+
+  // Swap icon
+  if (state === 'error') {
+    iconEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+    </svg>`;
+  } else {
+    iconEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>`;
+  }
+
+  // Hide every child EXCEPT the result div — keep the wrapper visible
+  if (mappingEl) {
+    Array.from(mappingEl.children).forEach(child => {
+      if (child !== resultEl) child.style.display = 'none';
+    });
+  }
+
+  hideStatus(type);
+  resultEl.className = `upload-result ${state} visible`;
 }
 
 // ─── Theme Toggle ─────────────────────────────────────────────────────────────
