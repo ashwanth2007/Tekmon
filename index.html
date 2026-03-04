@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
   <meta charset="UTF-8" />
@@ -32,13 +32,222 @@
       <div class="nav-divider"></div>
       <div class="nav-links">
         <button class="nav-link" data-page="dashboard" id="nav-dashboard">Dashboard</button>
+        <button class="nav-link" data-page="intake" id="nav-intake">Lead Intake</button>
         <button class="nav-link" data-page="leads" id="nav-leads">Lead List</button>
         <button class="nav-link" data-page="companies" id="nav-companies">Company List</button>
         <a class="nav-link nav-link-external" href="https://airtable.com/appofWsUg8Ply5bYd/pag5yt99HNCx5NRia"
           target="_blank" rel="noopener noreferrer">Database</a>
       </div>
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">
+        <!-- Moon icon (shown in dark mode) -->
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <!-- Sun icon (shown in light mode) -->
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+      </button>
     </div>
   </nav>
+
+  <!-- ─── PAGE: LEAD INTAKE ─── -->
+  <div class="page" id="page-intake">
+    <div class="container">
+
+      <div class="page-header">
+        <div class="page-badge">Lead Intake</div>
+        <h1 class="page-title">Lead Intake <span>Request Form</span></h1>
+        <p class="page-desc">
+          Submit a new lead search request. Fill in the targeting criteria below and our
+          team will run the search and populate your database.
+        </p>
+      </div>
+
+      <hr class="section-divider" />
+
+      <!-- Intake form -->
+      <form class="intake-form" id="intake-form" novalidate autocomplete="off">
+
+        <!-- Target Job Titles -->
+        <div class="intake-field-group">
+          <label class="intake-label" for="intake-job-titles">
+            Target Job Titles <span class="intake-required">*</span>
+          </label>
+          <p class="intake-hint">Enter the job titles you want to target, separated by commas.</p>
+          <p class="intake-example">e.g., QHSE Director, EHS Manager, HSE Manager, Safety Director, Head of QHSE</p>
+          <textarea id="intake-job-titles" class="intake-input intake-textarea" rows="3"
+            placeholder="QHSE Director, EHS Manager, HSE Manager..."></textarea>
+        </div>
+
+        <!-- Target Industries (optional) -->
+        <div class="intake-field-group">
+          <label class="intake-label" for="intake-industries">
+            Target Industries
+          </label>
+          <p class="intake-hint">Enter the industries you want to search within, separated by commas.</p>
+          <p class="intake-example">e.g., Manufacturing, Energy &amp; Utilities, Construction &amp; Real Estate,
+            Hospitality, Retail</p>
+          <textarea id="intake-industries" class="intake-input intake-textarea" rows="3"
+            placeholder="Manufacturing, Energy &amp; Utilities, Construction..."></textarea>
+        </div>
+
+        <!-- Target Geographies -->
+        <div class="intake-field-group">
+          <label class="intake-label" for="intake-geographies">
+            Target Geographies <span class="intake-required">*</span>
+          </label>
+          <p class="intake-hint">Enter the geographies you want to target, separated by commas.</p>
+          <p class="intake-example">e.g., North America, Europe, Middle East, Asia Pacific, United Kingdom, Australia
+          </p>
+          <textarea id="intake-geographies" class="intake-input intake-textarea" rows="3"
+            placeholder="North America, Europe, Middle East..."></textarea>
+        </div>
+
+        <!-- Keywords (optional) -->
+        <div class="intake-field-group">
+          <label class="intake-label" for="intake-keywords">
+            Keywords
+          </label>
+          <p class="intake-hint">Enter relevant business, technology, or service keywords associated with your target
+            companies. These keywords help refine the lead search by identifying companies that mention or use these
+            solutions in their operations.</p>
+          <p class="intake-example">e.g., Safety, EHS, Quality, QA, QC</p>
+          <textarea id="intake-keywords" class="intake-input intake-textarea" rows="3"
+            placeholder="Safety, EHS, Quality, QA, QC..."></textarea>
+        </div>
+
+        <!-- Leads to Generate -->
+        <div class="intake-field-group intake-field-group--short">
+          <label class="intake-label" for="intake-leads-count">
+            Leads to Generate <span class="intake-required">*</span>
+          </label>
+          <p class="intake-hint">Enter the number of leads you want this search to return. Maximum is 500.</p>
+          <p class="intake-example">e.g., 300 &nbsp;&middot;&nbsp; Format: Integer</p>
+          <input type="number" id="intake-leads-count" class="intake-input intake-input--short" placeholder="e.g., 300"
+            min="1" max="500" autocomplete="off" />
+        </div>
+
+        <!-- Checkboxes row -->
+        <div class="intake-check-row">
+
+          <!-- Number of Employees -->
+          <div class="intake-check-group">
+            <p class="intake-label">Number of Employees <span class="intake-required">*</span></p>
+            <p class="intake-hint">Select all company size ranges you want to include. You can select multiple ranges.
+            </p>
+            <div class="intake-checks" id="intake-employees">
+              <label class="intake-check-item intake-check--clr1"><input type="checkbox" value="1-10" />
+                <span>1-10</span></label>
+              <label class="intake-check-item intake-check--clr2"><input type="checkbox" value="11-50" />
+                <span>11-50</span></label>
+              <label class="intake-check-item intake-check--clr3"><input type="checkbox" value="51-100" />
+                <span>51-100</span></label>
+              <label class="intake-check-item intake-check--clr4"><input type="checkbox" value="101-200" />
+                <span>101-200</span></label>
+              <label class="intake-check-item intake-check--clr5"><input type="checkbox" value="201-500" />
+                <span>201-500</span></label>
+              <label class="intake-check-item intake-check--clr6"><input type="checkbox" value="501-1000" />
+                <span>501-1000</span></label>
+              <label class="intake-check-item intake-check--clr7"><input type="checkbox" value="1001-5000" />
+                <span>1001-5000</span></label>
+              <label class="intake-check-item intake-check--clr8"><input type="checkbox" value="5001-10000" />
+                <span>5001-10000</span></label>
+              <label class="intake-check-item intake-check--clr9"><input type="checkbox" value="10001+" />
+                <span>10001+</span></label>
+            </div>
+          </div>
+
+          <!-- Annual Revenue Range -->
+          <div class="intake-check-group">
+            <p class="intake-label">Annual Revenue Range <span class="intake-required">*</span></p>
+            <p class="intake-hint">Select all revenue brackets that match your ideal customer profile. You can select
+              multiple ranges.</p>
+            <div class="intake-checks" id="intake-revenue">
+              <label class="intake-check-item intake-check--clr1"><input type="checkbox" value="50M-100M" />
+                <span>50M-100M</span></label>
+              <label class="intake-check-item intake-check--clr2"><input type="checkbox" value="100M-250M" />
+                <span>100M-250M</span></label>
+              <label class="intake-check-item intake-check--clr3"><input type="checkbox" value="250M-500M" />
+                <span>250M-500M</span></label>
+              <label class="intake-check-item intake-check--clr4"><input type="checkbox" value="500M-1B" />
+                <span>500M-1B</span></label>
+              <label class="intake-check-item intake-check--clr6"><input type="checkbox" value="1B-10B" />
+                <span>1B-10B</span></label>
+              <label class="intake-check-item intake-check--clr9"><input type="checkbox" value="10B+" />
+                <span>10B+</span></label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Internal Context (optional) -->
+        <div class="intake-field-group">
+          <label class="intake-label" for="intake-context">
+            Internal Context
+          </label>
+          <p class="intake-hint">Add any additional context or instructions to help the team better understand this lead
+            search request. This field is for internal reference only and is not used in lead processing or automation.
+          </p>
+          <textarea id="intake-context" class="intake-input intake-textarea" rows="4"
+            placeholder="Add internal notes, context, or special instructions here..."></textarea>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit" id="btn-submit-intake">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+          Submit Request
+        </button>
+
+        <!-- Status bar -->
+        <div class="status-bar" id="status-intake" role="alert"></div>
+
+      </form>
+
+      <!-- ─── Success screen (hidden until submission) ─── -->
+      <div class="intake-success" id="intake-success">
+        <div class="intake-success-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <p class="intake-success-title">Data Sent Successfully</p>
+        <p class="intake-success-sub">Your lead intake request has been received and will be processed shortly.</p>
+        <button class="intake-success-btn" id="btn-intake-again">Submit Another Response</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="intake-toast" id="intake-toast" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+    <span id="intake-toast-msg">Data not sent. Please retry after some time.</span>
+    <button class="intake-toast-close" id="intake-toast-close" aria-label="Close">&times;</button>
+  </div>
 
   <!-- PAGE: DASHBOARD -->
   <div class="page" id="page-dashboard">
@@ -57,6 +266,21 @@
           <p class="dash-section-title">Tekmon Data Import Hub</p>
           <p class="dash-section-desc">A centralised workspace for uploading lead and company lists, mapping the
             required fields, and syncing structured data directly into your Airtable workflow.</p>
+
+          <button class="dash-card" data-page="intake">
+            <div class="dash-card-text">
+              <p class="dash-card-title">Lead Intake Request</p>
+              <p class="dash-card-desc">Submit a new lead search request. Define your target job titles, geographies,
+                company sizes, and revenue ranges to generate a qualified lead list.</p>
+            </div>
+            <div class="dash-card-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </div>
+          </button>
 
           <button class="dash-card" data-page="leads">
             <div class="dash-card-text">
@@ -153,7 +377,7 @@
         <p class="upload-title">Drag &amp; drop your file here</p>
         <p class="upload-sub">or <span onclick="document.getElementById('file-input-leads').click()">browse to
             upload</span></p>
-        <p class="upload-sub" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.25)">CSV · XLSX · XLS</p>
+        <p class="upload-sub upload-hint-text" style="margin-top:8px;font-size:12px;">CSV · XLSX · XLS</p>
         <input type="file" id="file-input-leads" accept=".csv,.xlsx,.xls" />
       </div>
 
@@ -267,7 +491,7 @@
         <p class="upload-title">Drag &amp; drop your file here</p>
         <p class="upload-sub">or <span onclick="document.getElementById('file-input-companies').click()">browse to
             upload</span></p>
-        <p class="upload-sub" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.25)">CSV · XLSX · XLS</p>
+        <p class="upload-sub upload-hint-text" style="margin-top:8px;font-size:12px;">CSV · XLSX · XLS</p>
         <input type="file" id="file-input-companies" accept=".csv,.xlsx,.xls" />
       </div>
 
