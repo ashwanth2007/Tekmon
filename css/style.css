@@ -65,7 +65,7 @@
   /* Misc */
   --btn-disabled-bg: rgba(255, 255, 255, 0.08);
   --upload-hint-color: rgba(255, 255, 255, 0.25);
-  --logo-filter: brightness(0) invert(1);
+  --logo-filter: none;
 }
 
 /* ---- LIGHT THEME ---- */
@@ -182,12 +182,16 @@ nav {
 }
 
 .nav-logo-img {
-  height: 26px;
+  height: 24px;
   width: auto;
   display: block;
   object-fit: contain;
-  filter: var(--logo-filter);
+  filter: brightness(0) invert(1);
   transition: filter 0.3s ease;
+}
+
+[data-theme="light"] .nav-logo-img {
+  filter: brightness(0);
 }
 
 .nav-divider {
