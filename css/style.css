@@ -1594,3 +1594,62 @@ footer a:hover {
     max-width: 100%;
   }
 }
+
+/* ---- UPLOAD RESULT SCREEN (Leads & Companies) ---- */
+.upload-result {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 32px 48px;
+  animation: fadeUp 0.4s ease;
+}
+
+.upload-result.visible {
+  display: flex;
+}
+
+.upload-result-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+
+/* success state */
+.upload-result.success .upload-result-icon {
+  background: rgba(34, 197, 94, 0.10);
+  border: 1px solid rgba(34, 197, 94, 0.30);
+  color: var(--status-success-color);
+}
+
+/* error state */
+.upload-result.error .upload-result-icon {
+  background: var(--status-error-bg);
+  border: 1px solid var(--red-border);
+  color: var(--red);
+}
+
+.upload-result-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.4px;
+  margin-bottom: 10px;
+}
+
+.upload-result.error .upload-result-title {
+  color: var(--red);
+}
+
+.upload-result-sub {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 440px;
+  line-height: 1.65;
+  margin-bottom: 32px;
+}
