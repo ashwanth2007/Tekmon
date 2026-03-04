@@ -424,6 +424,20 @@
 
         <!-- Status -->
         <div class="status-bar" id="status-leads" role="alert"></div>
+
+        <!-- Upload success screen -->
+        <div class="upload-result" id="result-leads">
+          <div class="upload-result-icon" id="result-icon-leads">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <p class="upload-result-title" id="result-title-leads">Data Sent Successfully</p>
+          <p class="upload-result-sub" id="result-sub-leads">Your lead list has been received and is now being
+            processed.</p>
+          <button class="intake-success-btn" id="btn-result-leads">Submit Another Response</button>
+        </div>
       </div>
 
     </div>
@@ -476,8 +490,20 @@
             <span class="extra-field-required">*</span>
           </label>
           <input type="number" id="input-leads-count" class="extra-field-input extra-field-input--short"
-            placeholder="e.g., 30" min="1" max="50" autocomplete="off" />
-          <p class="extra-field-hint">Number of leads to return per company. Maximum is 50.</p>
+            placeholder="e.g., 30" min="1" max="49" autocomplete="off" />
+          <p class="extra-field-hint">Number of leads to return per company. Maximum is 49.</p>
+        </div>
+
+
+        <div class="extra-field-group">
+          <label class="extra-field-label" for="input-geographies">
+            Target Geographies
+          </label>
+          <p class="extra-field-hint">Enter the geographies you want to target, separated by commas.</p>
+          <p class="extra-field-hint extra-field-example">e.g., North America, Europe, Middle East, Asia Pacific, United
+            Kingdom, Australia</p>
+          <textarea id="input-geographies" class="extra-field-input extra-field-textarea"
+            placeholder="North America, Europe, Middle East..." rows="3" autocomplete="off"></textarea>
         </div>
 
       </div>
@@ -538,6 +564,20 @@
 
         <!-- Status -->
         <div class="status-bar" id="status-companies" role="alert"></div>
+
+        <!-- Upload success screen -->
+        <div class="upload-result" id="result-companies">
+          <div class="upload-result-icon" id="result-icon-companies">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <p class="upload-result-title" id="result-title-companies">Data Sent Successfully</p>
+          <p class="upload-result-sub" id="result-sub-companies">Your company list has been received and is now being
+            processed.</p>
+          <button class="intake-success-btn" id="btn-result-companies">Submit Another Response</button>
+        </div>
       </div>
 
     </div>
