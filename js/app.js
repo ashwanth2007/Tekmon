@@ -4,7 +4,7 @@
  * Webhook: https://tekmon.app.n8n.cloud/webhook-test/2d13aaa3-607b-4b21-b942-74ab557150d0
  */
 
-const WEBHOOK = 'https://tekmon.app.n8n.cloud/webhook/2d13aaa3-607b-4b21-b942-74ab557150d0';
+const WEBHOOK = 'https://tekmon.app.n8n.cloud/webhook-test/2d13aaa3-607b-4b21-b942-74ab557150d0';
 
 // ─── Required field definitions ───────────────────────────────────────────────
 const REQUIRED_FIELDS = {
@@ -481,8 +481,165 @@ function hideStatus(type) {
   bar.innerHTML = '';
 }
 
+// ─── Theme Toggle ─────────────────────────────────────────────────────────────
+function initThemeToggle() {
+  const btn = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+
+  // Restore saved preference (default: dark)
+  const saved = localStorage.getItem('tekmon-theme') || 'light';
+  html.setAttribute('data-theme', saved);
+
+  btn.addEventListener('click', () => {
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('tekmon-theme', next);
+  });
+}
+
+// ─── Lead Intake Form ─────────────────────────────────────────────────────────
+function initIntakeForm() {
+  const form = document.getElementById('intake-form');
+  if (!form) return;
+
+  const successEl = document.getElementById('intake-success');
+  const btnAgain = document.getElementById('btn-intake-again');
+  const toast = document.getElementById('intake-toast');
+  const toastClose = document.getElementById('intake-toast-close');
+
+  // Toast helpers
+  let toastTimer;
+  function showToast(msg) {
+    document.getElementById('intake-toast-msg').textContent = msg;
+    toast.classList.add('visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('visible'), 6000);
+  }
+  toastClose.addEventListener('click', () => toast.classList.remove('visible'));
+
+  // Gather checked values from a container
+  function getChecked(containerId) {
+    return Array.from(
+      document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`)
+    ).map(cb => cb.value);
+  }
+
+  // Highlight / clear error on a field
+  function markError(el) { el.classList.add('intake-error'); }
+  function clearError(el) {
+    el.classList.remove('intake-error');
+    el.addEventListener('input', () => el.classList.remove('intake-error'), { once: true });
+  }
+
+  // Submit handler
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const jobTitlesEl = document.getElementById('intake-job-titles');
+    const geographiesEl = document.getElementById('intake-geographies');
+    const leadsCountEl = document.getElementById('intake-leads-count');
+
+    const jobTitles = jobTitlesEl.value.trim();
+    const industries = document.getElementById('intake-industries').value.trim();
+    const geographies = geographiesEl.value.trim();
+    const keywords = document.getElementById('intake-keywords').value.trim();
+    const leadsCount = parseInt(leadsCountEl.value, 10);
+    const employees = getChecked('intake-employees');
+    const revenue = getChecked('intake-revenue');
+    const context = document.getElementById('intake-context').value.trim();
+
+    // Validate required fields
+    let valid = true;
+
+    if (!jobTitles) { markError(jobTitlesEl); valid = false; } else clearError(jobTitlesEl);
+    if (!geographies) { markError(geographiesEl); valid = false; } else clearError(geographiesEl);
+
+    if (!leadsCountEl.value || isNaN(leadsCount) || leadsCount < 1 || leadsCount > 500) {
+      markError(leadsCountEl); valid = false;
+    } else {
+      clearError(leadsCountEl);
+    }
+
+    if (employees.length === 0) {
+      document.getElementById('intake-employees').style.outline = '2px solid var(--red)';
+      document.getElementById('intake-employees').style.borderRadius = '8px';
+      valid = false;
+    } else {
+      document.getElementById('intake-employees').style.outline = '';
+    }
+
+    if (revenue.length === 0) {
+      document.getElementById('intake-revenue').style.outline = '2px solid var(--red)';
+      document.getElementById('intake-revenue').style.borderRadius = '8px';
+      valid = false;
+    } else {
+      document.getElementById('intake-revenue').style.outline = '';
+    }
+
+    if (!valid) {
+      showStatus('intake', 'error', 'Please fill in all required fields before submitting.');
+      return;
+    }
+
+    // Build payload
+    const payload = {
+      list_type: 'query',
+      target_job_titles: jobTitles,
+      target_industries: industries || null,
+      target_geographies: geographies,
+      keywords: keywords || null,
+      leads_to_generate: leadsCount,
+      number_of_employees: employees,
+      annual_revenue_range: revenue,
+      internal_context: context || null,
+    };
+
+    const btn = document.getElementById('btn-submit-intake');
+    btn.disabled = true;
+    showStatus('intake', 'loading', 'Sending your request...');
+
+    try {
+      const resp = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (resp.ok) {
+        // Hide form, show success screen
+        form.style.display = 'none';
+        successEl.classList.add('visible');
+        hideStatus('intake');
+      } else {
+        btn.disabled = false;
+        hideStatus('intake');
+        showToast(`Data not sent — server responded with status ${resp.status}. Retry after some time.`);
+      }
+    } catch (err) {
+      btn.disabled = false;
+      hideStatus('intake');
+      showToast('Data not sent. Please retry after some time.');
+    }
+  });
+
+  // Reset form on "Submit Another Response"
+  btnAgain.addEventListener('click', () => {
+    form.reset();
+    form.style.display = '';
+    successEl.classList.remove('visible');
+    document.getElementById('intake-employees').style.outline = '';
+    document.getElementById('intake-revenue').style.outline = '';
+    document.getElementById('btn-submit-intake').disabled = false;
+    hideStatus('intake');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
   initUploads();
+  initThemeToggle();
+  initIntakeForm();
 });
